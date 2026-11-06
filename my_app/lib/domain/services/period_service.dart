@@ -1,4 +1,4 @@
-import 'package:my_app/domain/items/period.dart';
+import 'package:my_app/domain/items/report/period.dart';
 
 class PeriodService {
   // Calcul l'évolution de la valeur moyenne de commande par rapport à la période précédente

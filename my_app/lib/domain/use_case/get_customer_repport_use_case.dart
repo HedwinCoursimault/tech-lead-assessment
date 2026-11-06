@@ -1,7 +1,7 @@
 import 'package:my_app/domain/items/customer.dart';
 import 'package:my_app/domain/items/order.dart';
-import 'package:my_app/domain/items/period.dart';
-import 'package:my_app/domain/items/report.dart';
+import 'package:my_app/domain/items/report/period.dart';
+import 'package:my_app/domain/items/report/report.dart';
 import 'package:my_app/domain/repository/customer_repository.dart';
 import 'package:my_app/domain/repository/order_repository.dart';
 import 'package:my_app/domain/services/customer_service.dart';

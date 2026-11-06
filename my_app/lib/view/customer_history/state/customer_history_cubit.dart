@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_app/domain/items/report.dart';
+import 'package:my_app/domain/items/report/report.dart';
 import 'package:my_app/domain/use_case/get_customer_repport_use_case.dart';
 
 import 'customer_history_state.dart';

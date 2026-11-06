@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_app/domain/items/order.dart';
-import 'package:my_app/domain/items/period.dart';
+import 'package:my_app/domain/items/report/period.dart';
 import 'package:my_app/domain/services/period_service.dart';
 import 'package:my_app/view/customer_history/cmp/order_card.dart';
 

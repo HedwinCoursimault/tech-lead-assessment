@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_app/domain/items/order.dart';
-import 'package:my_app/domain/items/period.dart';
+import 'package:my_app/domain/items/report/period.dart';
 import 'package:my_app/domain/items/product_category.dart';
 import 'package:my_app/domain/services/order_service.dart';
 import '../helpers/helper.dart';

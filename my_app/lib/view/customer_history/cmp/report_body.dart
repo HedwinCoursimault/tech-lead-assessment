@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:my_app/domain/items/report.dart';
-import 'package:my_app/domain/items/period.dart';
+import 'package:my_app/domain/items/report/report.dart';
+import 'package:my_app/domain/items/report/period.dart';
 import 'package:my_app/view/customer_history/cmp/anomaly_card.dart';
 import 'package:my_app/view/customer_history/cmp/period_section.dart';
 

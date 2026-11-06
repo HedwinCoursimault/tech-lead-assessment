@@ -1,6 +1,6 @@
 // Objet métier représentant un rapport d'un client sur une période de 6 mois
 import 'package:my_app/domain/items/order.dart';
-import 'package:my_app/domain/items/period.dart';
+import 'package:my_app/domain/items/report/period.dart';
 
 class Report {
   /// Client concerné par le rapport

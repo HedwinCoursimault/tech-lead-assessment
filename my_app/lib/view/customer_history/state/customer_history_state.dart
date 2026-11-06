@@ -1,4 +1,4 @@
-import 'package:my_app/domain/items/report.dart';
+import 'package:my_app/domain/items/report/report.dart';
 
 enum CustomerHistoryStatus {
   initial,

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:my_app/domain/items/order.dart';
-import 'package:my_app/domain/items/period.dart';
+import 'package:my_app/domain/items/report/period.dart';
 
 /// Service permetant la manipulation de commandes
 class OrderService {
