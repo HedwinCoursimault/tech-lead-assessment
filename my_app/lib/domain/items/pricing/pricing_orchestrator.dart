@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:my_app/domain/items/customer.dart';
 import 'package:my_app/domain/items/order.dart';
 import 'package:my_app/domain/items/pricing/price_adjustment.dart';
@@ -6,7 +7,6 @@ import 'package:my_app/domain/items/pricing/pricing_context.dart';
 import 'package:my_app/domain/items/pricing/pricing_result.dart';
 import 'package:my_app/domain/items/pricing/pricing_rule.dart';
 import 'package:my_app/domain/items/pricing/pricing_rule_config.dart';
-import 'package:my_app/domain/services/order_service.dart';
 import 'package:my_app/domain/services/pricing_service.dart';
 
 class PricingOrchestrator {
@@ -22,30 +22,71 @@ class PricingOrchestrator {
     required Order order,
     required bool isFirstOrderOfTheMonth,
   }) {
-    int baseAmount = PricingService().valueToPrice(
-      OrderService().getOrderValue(order: order),
+    // Liste de tous les montants de toutes les lignes de la commandes
+    List<int> lineAmounts = order.lines.map((OrderLine line) {
+      return PricingService().valueToPrice(
+        line.quantity * line.unitPrice,
+      );
+    }).toList();
+
+    // Calcul du montant de base en ajoutant la somme de toutes les lignes
+    int baseAmount = lineAmounts.fold<int>(
+      0,
+      (int total, int amount) => total + amount,
     );
 
-    List<PricingRuleConfig> sortedRules = _sortRules(ruleConfigList);
-
+    // Création du context
     PricingContext context = PricingContext(
         order: order,
         customer: customer,
         isFirstOrderOfTheMonth: isFirstOrderOfTheMonth,
         baseAmount: baseAmount);
 
-    PricingCalculation calculation = PricingCalculation(
-        context: context,
-        lineAmounts: order.lines.map<int>(
-          (OrderLine orderLine) {
-            return PricingService()
-                .valueToPrice(orderLine.quantity * orderLine.unitPrice);
-          },
-        ).toList());
+    // Mapping des règles selon leur phase
+    Map<PricingPhase, List<PricingRuleConfig>> rulesPerPhase =
+        groupBy<PricingRuleConfig, PricingPhase>(
+      ruleConfigList,
+      (PricingRuleConfig rule) {
+        return rule.phase;
+      },
+    );
 
-    // On applique toutes les règles triés par ordre
-    for (PricingRuleConfig ruleConfig in sortedRules) {
-      _innerRuleApply(ruleConfig.rule, calculation);
+    // Tri des liste de chaque phase
+    rulesPerPhase.updateAll(
+      (PricingPhase phase, List<PricingRuleConfig> rules) {
+        return _sortRules(rules);
+      },
+    );
+
+    PricingCalculation calculation =
+        PricingCalculation(context: context, lineAmounts: lineAmounts);
+
+    // Règles exclues par une autre règle (dépendance direct)
+    Set<String> excludedRuleIds = <String>{};
+
+    for (PricingPhase phase in PricingPhase.values) {
+      // Mise à jour de la phase courante
+      calculation.currentPhase = phase;
+
+      List<PricingRuleConfig> phaseRules =
+          rulesPerPhase[phase] ?? <PricingRuleConfig>[];
+
+      for (PricingRuleConfig ruleConfig in phaseRules) {
+        // On ignore les règles exclues
+        if (excludedRuleIds.contains(ruleConfig.rule.id)) {
+          continue;
+        }
+        bool applied = _applyRule(
+            ruleConfig.rule, calculation, ruleConfig.pricingAmountReference);
+
+        if (applied) {
+          excludedRuleIds.addAll(ruleConfig.excludes);
+        }
+      }
+
+      // Capture du montant après chaque phase
+      calculation.lineAmountAfterPhases[phase] =
+          List<int>.of(calculation.lineAmounts);
     }
 
     return PricingResult(
@@ -55,14 +96,28 @@ class PricingOrchestrator {
     );
   }
 
-  void _innerRuleApply(PricingRule rule, PricingCalculation calculation) {
-    if (rule.shouldApply(calculation: calculation)) {
-      List<PriceAdjustment>? adjustementList =
-          rule.apply(calculation: calculation);
+  bool _applyRule(
+    PricingRule rule,
+    PricingCalculation calculation,
+    PricingAmountReference pricingAmountReference,
+  ) {
+    if (rule.shouldApply(
+      calculation: calculation,
+      pricingAmountReference: pricingAmountReference,
+    )) {
+      List<PriceAdjustment> adjustments = rule.apply(
+        calculation: calculation,
+        pricingAmountReference: pricingAmountReference,
+      );
 
-      for (PriceAdjustment adjustment in adjustementList) {
+      for (PriceAdjustment adjustment in adjustments) {
         calculation.applyAdjustment(adjustment: adjustment);
       }
+
+      // Une règle qui n'a provoqué aucun ajustement est consiédéré comme non appliquée
+      return adjustments.isNotEmpty;
+    } else {
+      return false;
     }
   }
 
@@ -108,7 +163,7 @@ class PricingOrchestrator {
       // Tri dans l'ordre des priorité croissantes
       available.sort(
         (PricingRuleConfig a, PricingRuleConfig b) {
-          int comparaison = b.priority.compareTo(a.priority);
+          int comparaison = a.priority.compareTo(b.priority);
 
           if (comparaison != 0) {
             return comparaison;

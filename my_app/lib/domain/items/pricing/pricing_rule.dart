@@ -2,6 +2,7 @@ import 'package:my_app/domain/items/customer_type.dart';
 import 'package:my_app/domain/items/order.dart';
 import 'package:my_app/domain/items/pricing/price_adjustment.dart';
 import 'package:my_app/domain/items/pricing/pricing_calculation.dart';
+import 'package:my_app/domain/items/pricing/pricing_rule_config.dart';
 import 'package:my_app/domain/items/product_category.dart';
 import 'package:my_app/domain/services/pricing_service.dart';
 
@@ -18,10 +19,12 @@ abstract class PricingRule {
 
   bool shouldApply({
     required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
   });
 
   List<PriceAdjustment> apply({
     required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
   });
 }
 
@@ -34,12 +37,18 @@ class PremiumDiscountRule extends PricingRule {
         );
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return calculation.context.customer.customerType == CustomerType.premium;
   }
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     Order order = calculation.context.order;
 
     return List<PriceAdjustment>.generate(order.lines.length, (int index) {
@@ -67,12 +76,18 @@ class VipDiscountRule extends PricingRule {
         );
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return calculation.context.customer.customerType == CustomerType.vip;
   }
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     Order order = calculation.context.order;
 
     return List<PriceAdjustment>.generate(order.lines.length, (int index) {
@@ -100,12 +115,18 @@ class FirstOrderDiscountRule extends PricingRule {
         );
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return calculation.context.isFirstOrderOfTheMonth;
   }
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     Order order = calculation.context.order;
 
     return List<PriceAdjustment>.generate(order.lines.length, (int index) {
@@ -133,13 +154,24 @@ class Sum500OrderDiscountRule extends PricingRule {
         );
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
-    int totalAmount = calculation.totalAmount;
-    return totalAmount > 50000;
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
+    int? totalAmount =
+        calculation.effectiveAmountAtPhase(phase: PricingPhase.base);
+    if (totalAmount != null) {
+      return totalAmount > 50000;
+    } else {
+      return false;
+    }
   }
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     Order order = calculation.context.order;
 
     return List<PriceAdjustment>.generate(order.lines.length, (int index) {
@@ -165,13 +197,24 @@ class Sum1000OrderDiscountRule extends PricingRule {
         );
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
-    int totalAmount = calculation.totalAmount;
-    return totalAmount > 100000;
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
+    int? totalAmount =
+        calculation.effectiveAmountAtPhase(phase: PricingPhase.base);
+    if (totalAmount != null) {
+      return totalAmount > 100000;
+    } else {
+      return false;
+    }
   }
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     Order order = calculation.context.order;
 
     return List<PriceAdjustment>.generate(order.lines.length, (int index) {
@@ -205,12 +248,19 @@ class CatOrderTaxRule extends PricingRule {
   });
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
-    return getTaxedLinesIndex(calculation: calculation).isNotEmpty;
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
+    return getTaxedLinesIndex(
+            calculation: calculation,
+            pricingAmountReference: pricingAmountReference)
+        .isNotEmpty;
   }
 
   Map<int, String> getTaxedLinesIndex({
     required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
   }) {
     Map<int, String> taxesPerOrderLine = <int, String>{};
 
@@ -235,13 +285,17 @@ class CatOrderTaxRule extends PricingRule {
   }
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     List<PriceAdjustment> adjustments = <PriceAdjustment>[];
 
     List<OrderLine> lines = calculation.context.order.lines;
 
-    Map<int, String> taxableOrders =
-        getTaxedLinesIndex(calculation: calculation);
+    Map<int, String> taxableOrders = getTaxedLinesIndex(
+        calculation: calculation,
+        pricingAmountReference: pricingAmountReference);
 
     for (int currentLineIndex = 0;
         currentLineIndex < lines.length;
@@ -297,13 +351,17 @@ class MultipleProductSameCategoryDiscountRule extends PricingRule {
   }
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return getEligibleCategories(calculation).isNotEmpty;
   }
 
   @override
   List<PriceAdjustment> apply({
     required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
   }) {
     Set<String> eligibleCategories = getEligibleCategories(calculation);
     List<PriceAdjustment> adjustments = <PriceAdjustment>[];
@@ -344,7 +402,10 @@ class ExpressDeliveryFees extends PricingRule {
                 'Frais de 15€ sur la commande globale pour les commandes express');
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return <PriceAdjustment>[
       PriceAdjustment(
         amount: 1500,
@@ -355,7 +416,10 @@ class ExpressDeliveryFees extends PricingRule {
   }
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return calculation.context.order.expressDelivery;
   }
 }
@@ -369,7 +433,10 @@ class ProcessingFees extends PricingRule {
                 'Frais de 5€ sur la commande globale pour les commandes < 50€');
 
   @override
-  List<PriceAdjustment> apply({required PricingCalculation calculation}) {
+  List<PriceAdjustment> apply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return <PriceAdjustment>[
       PriceAdjustment(
         amount: 500,
@@ -380,7 +447,10 @@ class ProcessingFees extends PricingRule {
   }
 
   @override
-  bool shouldApply({required PricingCalculation calculation}) {
+  bool shouldApply({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
     return calculation.totalAmount < 5000;
   }
 }
