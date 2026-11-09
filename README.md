@@ -1,3 +1,7 @@
+## Structure
+
+J'ai créer un projet flutter pour les question 1 et 2. Le projet se trouve dans le dossier my_app. A la racine de ce dossier se trouve un README qui permet d'installer le plus rapidement possible l'environnement Flutter pour à la fois lancer le projet et pouvoir parcourir facilement le code.
+
 ## Exercice 1 — Rapport client
 
 ### Choix d'implémentation et hypothèses

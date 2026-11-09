@@ -43,3 +43,7 @@ Une partie des tests ont été créer à l'aide de l'IA (aide sur la structure, 
 
 Je n'ai pas push les tests générés par IA car les consignes demandaient de ne pas faire de copier coller de code avec IA, ces tests m'ont permis de mon côté de construire mon code en validant son fonctionnement au fur et a mesure
 
+### 7. Notice d'installation
+
+Le README présent à la racine du projet my_app est complétement généré par IA par soucis de clareté et de simplicité. Il s'agit simplement des instructions pour intéragir avec le projet flutter. Il a été bien évidemment relu et vérifié.
+
