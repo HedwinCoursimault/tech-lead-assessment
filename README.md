@@ -34,6 +34,9 @@ Les périodes vides ne sont pas représentées dans le rapport. Par conséquent,
 
 La lecture des données pourrait être enrichie par une gestion plus détaillée des erreurs (données invalides, références de produits inexistantes, etc.), permettant de distinguer les données rejetées des véritables absences de résultats et de faciliter le diagnostic.
 
+**Architecture globale** 
+L'injection de dépendance est faite au travers de toutes les couches depuis le main.dart. C'est peu problématique dans notre cas car il y a peu de dépendance mais dans un plus gros projet, il convient d'utiliser une solution d'injection de dépendance globale, qui permette de récupérer les classes à utiliser (getIt en flutter par exemple)
+
 ## Exercices 2 
 
 ### choix d'interprétation
