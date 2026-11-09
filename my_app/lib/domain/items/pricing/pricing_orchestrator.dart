@@ -21,6 +21,7 @@ class PricingOrchestrator {
     required Customer customer,
     required Order order,
     required bool isFirstOrderOfTheMonth,
+    List<String> disabledRuleIds = const <String>[],
   }) {
     // Liste de tous les montants de toutes les lignes de la commandes
     List<int> lineAmounts = order.lines.map((OrderLine line) {
@@ -73,7 +74,8 @@ class PricingOrchestrator {
 
       for (PricingRuleConfig ruleConfig in phaseRules) {
         // On ignore les règles exclues
-        if (excludedRuleIds.contains(ruleConfig.rule.id)) {
+        if (excludedRuleIds.contains(ruleConfig.rule.id) ||
+            disabledRuleIds.contains(ruleConfig.rule.id)) {
           continue;
         }
         bool applied = _applyRule(
@@ -81,6 +83,38 @@ class PricingOrchestrator {
 
         if (applied) {
           excludedRuleIds.addAll(ruleConfig.excludes);
+
+          for (String ruleId in ruleConfig.invalidates) {
+            // Retrouver la configuration de la règle concernée
+            PricingRuleConfig? targetConfig = ruleConfigList.firstWhereOrNull(
+              (PricingRuleConfig config) => config.rule.id == ruleId,
+            );
+
+            if (targetConfig == null) {
+              throw StateError("Règle à invalider introuvable : $ruleId");
+            }
+
+            // Vérifier que cette règle a effectivement été appliquée
+            bool wasApplied = calculation.adjustments.any(
+              (PriceAdjustment adjustment) =>
+                  adjustment.appliedRuleId == ruleId,
+            );
+
+            if (!wasApplied) continue;
+
+            // Demander à la règle si elle reste valide
+            if (!targetConfig.rule.shouldRemainApplied(
+                calculation: calculation,
+                pricingAmountReference: targetConfig.pricingAmountReference)) {
+              // Recalculer sans la règle invalidée
+              return calculatePrice(
+                customer: customer,
+                order: order,
+                isFirstOrderOfTheMonth: isFirstOrderOfTheMonth,
+                disabledRuleIds: <String>[...disabledRuleIds, ruleId],
+              );
+            }
+          }
         }
       }
 

@@ -22,6 +22,13 @@ abstract class PricingRule {
     required PricingAmountReference pricingAmountReference,
   });
 
+  bool shouldRemainApplied({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
+    return true;
+  }
+
   List<PriceAdjustment> apply({
     required PricingCalculation calculation,
     required PricingAmountReference pricingAmountReference,
@@ -165,6 +172,14 @@ class Sum500OrderDiscountRule extends PricingRule {
     } else {
       return false;
     }
+  }
+
+  @override
+  bool shouldRemainApplied({
+    required PricingCalculation calculation,
+    required PricingAmountReference pricingAmountReference,
+  }) {
+    return calculation.currentAmount >= 50000;
   }
 
   @override

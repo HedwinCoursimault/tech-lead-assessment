@@ -62,3 +62,4 @@ L'injection de dépendance est faite au travers de toutes les couches depuis le 
 - Rendre dynamique la gestion des catégorie de règles sans passer par une énum
 - Permettre la création dynamique de règle via un fichier json
 - Gérer le recalcule lorsqu'une règle qui en exclue une autre est exécutée après la règle qu'elle doit exclure
+- Documenter le fonctionnement global du moteur de prix
