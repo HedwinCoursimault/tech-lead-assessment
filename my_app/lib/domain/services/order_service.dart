@@ -34,6 +34,43 @@ class OrderService {
     );
   }
 
+  bool isFirstOrderOfMonth({
+    required Order order,
+    required List<Order> monthlyOrders,
+  }) {
+    DateTime referenceDate = order.orderDate.toUtc();
+    bool orderFound = false;
+    bool earlierOrderFound = false;
+
+    for (Order candidate in monthlyOrders) {
+      DateTime candidateDate = candidate.orderDate.toUtc();
+
+      if (candidate.customerId != order.customerId ||
+          candidateDate.year != referenceDate.year ||
+          candidateDate.month != referenceDate.month) {
+        continue;
+      }
+
+      if (candidate.id == order.id) {
+        orderFound = true;
+      }
+
+      if (candidateDate.isBefore(referenceDate) ||
+          (candidateDate.isAtSameMomentAs(referenceDate) &&
+              candidate.id.compareTo(order.id) < 0)) {
+        earlierOrderFound = true;
+      }
+    }
+
+    if (!orderFound) {
+      throw Exception(
+        "La commande ${order.id} est absente de son historique mensuel.",
+      );
+    }
+
+    return !earlierOrderFound;
+  }
+
   /// Calcul de la valeur totale d'une commande
   double getOrderValue({required Order order}) {
     return order.lines.fold<double>(

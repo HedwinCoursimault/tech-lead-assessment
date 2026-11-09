@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_app/domain/items/customer.dart';
-import 'package:my_app/domain/items/customer_type.dart';
 import 'package:my_app/domain/items/order.dart';
 import 'package:my_app/domain/items/pricing/pricing_result.dart';
 import 'package:my_app/domain/use_case/calculate_order_price_use_case.dart';
@@ -35,31 +33,15 @@ class PriceCalculationCubit extends Cubit<PriceCalculationState> {
     }
 
     try {
-      // Les deux appels ci-dessous sont les points à adapter si les
-      // paramètres des use cases existants portent d'autres noms.
       Order? order = await getOrderUseCase.call(orderId: id);
       if (order != null) {
-        PricingResult? result = await calculatePriceUseCase.call(
-            order: order,
-            customer: Customer(
-                id: "id",
-                name: "name",
-                email: "email",
-                customerType: CustomerType.premium,
-                registrationDate: DateTime.now()));
-        if (result != null) {
-          emit(state.copyWith(
-            status: PriceCalculationStatus.success,
-            order: order,
-            result: result,
-          ));
-        } else {
-          emit(state.copyWith(
-            status: PriceCalculationStatus.error,
-            errorMessage: "Une erreur est survenue pendant le calcul du prix",
-            clearResult: true,
-          ));
-        }
+        PricingResult result = await calculatePriceUseCase.call(order: order);
+        emit(state.copyWith(
+          status: PriceCalculationStatus.success,
+          order: order,
+          result: result,
+          clearError: true,
+        ));
       } else {
         emit(state.copyWith(
           status: PriceCalculationStatus.error,
