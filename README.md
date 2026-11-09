@@ -33,3 +33,25 @@ Les périodes vides ne sont pas représentées dans le rapport. Par conséquent,
 **Qualité des données**
 
 La lecture des données pourrait être enrichie par une gestion plus détaillée des erreurs (données invalides, références de produits inexistantes, etc.), permettant de distinguer les données rejetées des véritables absences de résultats et de faciliter le diagnostic.
+
+## Exercices 2 
+
+### choix d'interprétation
+
+- Les catégories de règles sont définies et ordonnées
+- Les règles d'une catégorie sont appliquées les unes à la suite des autres dans leur ordre de priorité (ordre de lecture dans l'exercice), sauf mention contraire
+	- La règles des 8% est avant la règles des 5%
+	- Les règles de bases s'appliquent toutes sur le prix brut de base (pas à la chaine)
+	- Les règles finales s'appliquent en cascade dans leur ordre de déclaration (de priorité)
+- Les règles conditionnelles ne sont pas nécessairement exclusives
+- Si deux règles sont exclusives entre elles, la première règle dans la liste d'exécution empêches celles avec lesquelles elle est incompatible de s'exécuter. 
+- Les réduction globales sont répercutés sur chaque lignes qui composent la commande afin de pouvoir appliquer des règles ciblés après des réductions globales
+- Les règles de seuil cumulatif doivent expliciter les recalculs qu'elles provoquent. Dans le cas déclaré, si le montant descend en dessous de 500€, on provoque une annulation de la règles de 500€ et donc un recalcul, mais la chose n'est pas vrai pour le seuil des 1000€ car ce n'est pas explicité
+- Les règle conditionnelles s'appliquent sur le prix après les réduction de base mais dans l'ordre de déclaration si plusieurs ne sont pas incompatible (dans le scénario où de nouvelles règles serait rajoutées). Cela est plus cohérent avec le comportement des règles de seuil cumulatif qui implique un recalcul de la règle sur un prix courant plutôt que sur un prix fixe après les règles de base
+- Lorsqu'une règle est invalidé, elle ne peut pas être réintroduite par une autre règle. 
+
+### améliorations à apporter
+
+- Rendre dynamique la gestion des catégorie de règles sans passer par une énum
+- Permettre la création dynamique de règle via un fichier json
+- Gérer le recalcule lorsqu'une règle qui en exclue une autre est exécutée après la règle qu'elle doit exclure

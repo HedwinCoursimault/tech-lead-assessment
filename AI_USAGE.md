@@ -36,3 +36,10 @@ Questions ponctuelles sur les fonctionnalités du langage et les outils disponib
 
 **Exemple de prompt :**
 > Comment je peux faire ça plus simplement mathématiquement ? En gros je veux vérifier que le nombre n'est pas trop proche de 0, qu'à deux décimales ça n'affiche pas 0.00.
+
+### 6. Aide sur la génération de tests
+
+Une partie des tests ont été créer à l'aide de l'IA (aide sur la structure, les helpers etc). Une autre partie des tests ont été totalement générés par IA.
+
+Je n'ai pas push les tests générés par IA car les consignes demandaient de ne pas faire de copier coller de code avec IA, ces tests m'ont permis de mon côté de construire mon code en validant son fonctionnement au fur et a mesure
+
