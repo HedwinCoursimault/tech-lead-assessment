@@ -54,8 +54,11 @@ L'injection de dépendance est faite au travers de toutes les couches depuis le 
 - Si deux règles sont exclusives entre elles, la première règle dans la liste d'exécution empêches celles avec lesquelles elle est incompatible de s'exécuter. 
 - Les réduction globales sont répercutés sur chaque lignes qui composent la commande afin de pouvoir appliquer des règles ciblés après des réductions globales
 - Les règles de seuil cumulatif doivent expliciter les recalculs qu'elles provoquent. Dans le cas déclaré, si le montant descend en dessous de 500€, on provoque une annulation de la règles de 500€ et donc un recalcul, mais la chose n'est pas vrai pour le seuil des 1000€ car ce n'est pas explicité
+- La réevaluation se fait sur le montant courrant après application de la règle de seuil. Dans le cas présent cela signifie que cela est fait sur le montant "TTC" comme les taxes sont ajoutées avant la remise des seuils
 - Les règle conditionnelles s'appliquent sur le prix après les réduction de base mais dans l'ordre de déclaration si plusieurs ne sont pas incompatible (dans le scénario où de nouvelles règles serait rajoutées). Cela est plus cohérent avec le comportement des règles de seuil cumulatif qui implique un recalcul de la règle sur un prix courant plutôt que sur un prix fixe après les règles de base
 - Lorsqu'une règle est invalidé, elle ne peut pas être réintroduite par une autre règle. 
+
+**note** Parmis toutes les commandes fournies dans le json, je n'ai trouvée aucune commande qui nécéssite l'annulation de la règles des 5% selon mon interprétation des règles initiales
 
 ### améliorations à apporter
 

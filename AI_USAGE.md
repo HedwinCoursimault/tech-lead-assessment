@@ -47,3 +47,6 @@ Je n'ai pas push les tests générés par IA car les consignes demandaient de ne
 
 Le README présent à la racine du projet my_app est complétement généré par IA par soucis de clareté et de simplicité. Il s'agit simplement des instructions pour intéragir avec le projet flutter. Il a été bien évidemment relu et vérifié.
 
+### 8. Aide à la création de composant graphique
+
+Pour faciliter et accélérer le développement je me suis aidé de l'IA pour générer certaines parties de composants graphiques

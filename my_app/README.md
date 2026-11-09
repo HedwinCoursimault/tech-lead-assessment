@@ -10,9 +10,11 @@ Deux méthodes permettent de tester l'application :
 - **Exécuter directement la version Windows compilée**, sans installation de Flutter.
 - **Lancer le projet depuis les sources**, pour consulter le code, exécuter l'application et lancer les tests.
 
-## 1. Exécution directe (sans installation)
+## 1. Exécution directe (sans installation) 
 
-Une version Windows compilée est fournie séparément, dans une archive ZIP.
+### Windows
+
+Une version Windows compilée est fournie séparément, dans une archive ZIP à la racine.
 
 1. Télécharger et extraire l'archive contenant l'application.
 2. Ouvrir le dossier extrait.
@@ -23,6 +25,18 @@ Aucune installation de Flutter, Dart ou d'un environnement de développement n'e
 **Important :** conserver tous les fichiers et sous-dossiers de l'archive à côté de l'exécutable. L'application nécessite notamment ses bibliothèques DLL et son dossier `data`.
 
 Sur certaines machines, l'installation du Microsoft Visual C++ Redistributable peut être nécessaire.
+
+### Web
+
+Une version web est fournie séparément, dans une archive ZIP à la racine.
+
+Après décompression, il suffit de servir le code sur un serveur http, par exemple avec python :
+
+```
+python -m http.server 8080
+```
+
+Puis ouvrir http://localhost:8080 dans son navigateur.
 
 ## 2. Installation de l'environnement de développement
 
@@ -140,3 +154,7 @@ Les points d'entrée principaux sont :
 - `lib/domain/use_case/` : cas d'utilisation.
 - `lib/domain/items/pricing/` : moteur de calcul des prix.
 - `lib/config/pricing_rules.dart` : déclaration et configuration des règles de pricing.
+
+## 6. Mise à jour des données
+
+Les données de base sont fournies dans un json. Pour faciliter la manipulation des données dans un environnement flutter, ce json n'est pas lu depuis les assets packagés de l'application mais mit en dur dans le code. Il est possible de le changer ou de l'agrémenter dans les fichiers dédiés (lib/data/data_source/local/)
